@@ -1,1 +1,0 @@
-execute >path=/home/why/Desktop/pruebas.eea
