@@ -35,16 +35,28 @@ void manager::cmd(){
 
 void manager::search(string tk,vector<string> tks){
     
-    if (tk == "mkdisk"){
+    if (lower(tk) == "mkdisk"){
         Disk.mkdisk(tks);
     }
-    else if (tk== "fdisk"){
+    // }else if (lower(tk) == "rmdisk"){
+    //     Disk.rmdisk(tks);
+    else if (lower(tk) == "fdisk"){
         Disk.fdisk(tks);
     }
-    else if (tk== "rep"){
+    // else if (lower(tk) == "mount"){
+    //     Disk.mount(tks);
+    // }
+    // else if (lower(tk) == "unmount"){
+    //     Disk.unmount(tks);
+    // }
+
+
+    else if (lower(tk) == "rep"){
         Disk.rep();
-    }else if (tk== "execute"){
+    }else if (lower(tk) == "execute"){
         execute(tks);
+    }else if (lower(tk) == "pause"){
+        pause();
     }else if (tk.substr(0,1) == "#"){
         cout << tk << endl;
     }else{
@@ -80,6 +92,12 @@ void manager::execute(vector<string> tks){
         }
     }
     input_file.close();
+}
+
+
+void manager::pause(){
+    cout << "Presione enter para continuar...";
+    cin.get();
 }
 
 

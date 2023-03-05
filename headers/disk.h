@@ -17,12 +17,12 @@ struct Partition {
     int part_start = -1;
     int part_size = 0;
     char part_name[16];
+    int part_number = -1;
 };
 
-struct MBR
-{
+struct MBR{
     int mbr_tamano;
-    char mbr_fecha_creacion[20];
+    time_t mbr_fecha_creacion;
     int mbr_disk_signature;
     char disk_fit;
     Partition mbr_Partition_1;
@@ -31,13 +31,13 @@ struct MBR
     Partition mbr_Partition_4;
 };
 
-struct EBR {
+struct EBR{
     char part_status = '0';
     char part_fit;
     int part_start;
     int part_size = 0;
-    int part_next = -1;
-    char part_name[24];
+    int part_next = -1; 
+    char part_name[16];
 };
 
 struct Stepper {
@@ -48,6 +48,17 @@ struct Stepper {
     int after;
 };
 
+struct Mounted_P{
+    char id[20];
+    char name[20];
+    char status = '0';
+};
+
+struct Mounted_D{
+    char path[150];
+    char status = '0';
+    Mounted_P mounted_p[99];
+};
 
 using namespace std;
 
@@ -56,10 +67,14 @@ class disk{
     public:
 
         void mkdisk(vector<string> tks);
+        void rmdisk(vector<string> tks);
         void fdisk(vector<string> tks);
+        void mount(vector<string> tks);
+        void unmount(vector<string> tks);
+        void mounted();
+        void rep();
         Partition tracker(MBR mbr, string name, string path);
         vector<EBR> get_type_logic(Partition partition, string path);
-        void rep();
 
 };
 

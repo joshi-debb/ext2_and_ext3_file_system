@@ -18,6 +18,7 @@ class manager{
         string lower(string str);
         string token(string text);                      
         vector<string> split_tokens(string text);
+        void pause();
     
 };
 
