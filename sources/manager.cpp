@@ -1,7 +1,5 @@
 
-
 #include "../headers/manager.h"
-#include "../headers/disk.h"
 
 #include <string>
 #include <vector>
@@ -9,11 +7,9 @@
 #include <stdlib.h>
 #include <bits/stdc++.h>
 
-
 using namespace std;
 
-disk Disk;
-
+//funcion de terminal
 void manager::cmd(){
 
     do {
@@ -33,25 +29,37 @@ void manager::cmd(){
 
 }
 
+//funcion para buscar comando
 void manager::search(string tk,vector<string> tks){
     
     if (lower(tk) == "mkdisk"){
-        Disk.mkdisk(tks);
-    }
-    // }else if (lower(tk) == "rmdisk"){
-    //     Disk.rmdisk(tks);
-    else if (lower(tk) == "fdisk"){
+    Disk.mkdisk(tks);
+    }else if (lower(tk) == "rmdisk"){
+        Disk.rmdisk(tks);
+    }else if (lower(tk) == "fdisk"){
         Disk.fdisk(tks);
-    }
-    // else if (lower(tk) == "mount"){
-    //     Disk.mount(tks);
-    // }
-    // else if (lower(tk) == "unmount"){
-    //     Disk.unmount(tks);
-    // }
-
-
-    else if (lower(tk) == "rep"){
+    }else if (lower(tk) == "mount"){
+        Disk.mount(tks);
+    }else if (lower(tk) == "unmount"){
+        Disk.unmount(tks);
+    }else if (lower(tk) == "mkfs"){
+        Disk.mkfs(tks);
+    }else if (lower(tk) == "login"){
+        if (!User.logged_in) User.login(tks, Disk);
+        else cout << "Ya hay una sesion iniciada" << endl;
+    }else if (lower(tk) == "logout"){
+        if (User.logged_in) User.logout();
+        else cout << "No hay ninguna sesion iniciada" << endl;
+    }else if (lower(tk) == "mkgrp" || lower(tk) == "rmgrp" || lower(tk) == "mkusr" || lower(tk) == "rmusr"){
+        if (User.logged_in){
+            if (lower(tk) == "mkgrp") User.mkgrp(tks);
+            else if (lower(tk) == "rmgrp") User.rmgrp(tks);
+            else if (lower(tk) == "mkusr") User.mkusr(tks);
+            else if (lower(tk) == "rmusr") User.rmusr(tks);
+        }else{
+            cout << "No hay ninguna sesion iniciada" << endl;
+        }
+    }else if (lower(tk) == "rep"){
         Disk.rep();
     }else if (lower(tk) == "execute"){
         execute(tks);
@@ -65,6 +73,7 @@ void manager::search(string tk,vector<string> tks){
 
 }
 
+//funcion para ejecutar script
 void manager::execute(vector<string> tks){
     string txt;
     for (string token : tks){
@@ -74,7 +83,6 @@ void manager::execute(vector<string> tks){
             txt = token;
         }
     }
-
     string filename(txt);
     vector <string> lines;
     string line;
@@ -94,23 +102,13 @@ void manager::execute(vector<string> tks){
     input_file.close();
 }
 
-
+//funcion pause
 void manager::pause(){
-    cout << "Presione enter para continuar...";
+    cout << "Presione enter para continuar..." << endl;
     cin.get();
 }
 
-
-string manager::lower(string String){
-    string aux;
-    locale loc;
-    for (int i = 0; i < String.length(); i++){
-        aux += tolower(String[i], loc);
-    }
-    return aux;
-}
-
-
+//funcion para extraer token
 string manager::token(string txt){
     string tkn = "";
     bool flag = false;
@@ -132,6 +130,7 @@ string manager::token(string txt){
     }return tkn;
 }
 
+//funcion para separar tokens
 vector<string> manager::split_tokens(string txt){
     vector<string> tokens;
     txt.push_back(' ');
@@ -172,4 +171,14 @@ vector<string> manager::split_tokens(string txt){
         }
     }
     return tokens;
+}
+
+//funcion para convertir a minusculas
+string manager::lower(string String){
+    string aux;
+    locale loc;
+    for (int i = 0; i < String.length(); i++){
+        aux += tolower(String[i], loc);
+    }
+    return aux;
 }

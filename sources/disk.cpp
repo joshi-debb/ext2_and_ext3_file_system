@@ -1,6 +1,5 @@
 
 #include "../headers/disk.h"
-#include "../headers/manager.h"
 
 #include <vector>
 #include <iostream>
@@ -10,10 +9,9 @@
 #include <cstring>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <math.h>
 
 using namespace std;
-
-manager Manager;
 
 //comando mkdisk
 void disk::mkdisk(vector<string> tks){
@@ -29,25 +27,25 @@ void disk::mkdisk(vector<string> tks){
     for (string token:tks){
         string tk = token.substr(0, token.find("="));
         token.erase(0,tk.length()+1);
-        if (Manager.lower(tk) == "fit"){
-            if (Manager.lower(token) == "bf" || Manager.lower(token) == "ff" || Manager.lower(token) == "wf"){
-                fit = Manager.lower(token);
+        if (lower(tk) == "fit"){
+            if (lower(token) == "bf" || lower(token) == "ff" || lower(token) == "wf"){
+                fit = lower(token);
             }else{
                 cout << "Parametro fit no valido" << endl; 
             }
-        }else if(Manager.lower(tk) == "unit"){
-            if (Manager.lower(token)  == "k" || Manager.lower(token) == "m"){
-                unit = Manager.lower(token);  
+        }else if(lower(tk) == "unit"){
+            if (lower(token)  == "k" || lower(token) == "m"){
+                unit = lower(token);  
             }else{
                 cout<< "Parametro unit no valido" << endl; 
             }
-        }else if (Manager.lower(tk) == "size"){
+        }else if (lower(tk) == "size"){
             size = stoi(token);
             if( size <= 0){
                 cout << "Parametro size no valido" << endl;
                 return;
             }
-        }else if (Manager.lower(tk) == "path"){
+        }else if (lower(tk) == "path"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 path = token.substr(1, token.length() - 2);
@@ -55,7 +53,7 @@ void disk::mkdisk(vector<string> tks){
                 path = token;
             }
             //verificar extension del archivo.dsk
-            if(Manager.lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
+            if(lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
                 cout << "Error: Extensión de archivo no valida" << endl;
                 return;
             }
@@ -97,8 +95,8 @@ void disk::mkdisk(vector<string> tks){
 
     disco.mbr_tamano = size;
     disco.mbr_fecha_creacion = time(nullptr);
-    disco.disk_fit = tolower(fit[0]);
-    disco.mbr_disk_signature = rand() % 9999 + 100;
+    disco.dsk_fit = tolower(fit[0]);
+    disco.mbr_dsk_signature = rand() % 9999 + 100;
 
     //inicilizar particiones
     disco.mbr_Partition_1 = Partition();
@@ -126,7 +124,7 @@ void disk::rmdisk(vector<string> tks){
     for (string token:tks){
         string tk = token.substr(0, token.find("="));
         token.erase(0,tk.length()+1);
-        if (Manager.lower(tk) == "path"){
+        if (lower(tk) == "path"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 path = token.substr(1, token.length() - 2);
@@ -134,7 +132,7 @@ void disk::rmdisk(vector<string> tks){
                 path = token;
             }
             //verificar extension del archivo.dsk
-            if(Manager.lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
+            if(lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
                 cout << "Error: Extensión de archivo no valida" << endl;
                 return;
             }
@@ -151,7 +149,7 @@ void disk::rmdisk(vector<string> tks){
                 cout << "¿Desea eliminar el archivo? [Y/N]" << endl;
                 string respuesta;
                 getline(cin,respuesta);
-                if (Manager.lower(respuesta) == "y"){
+                if (lower(respuesta) == "y"){
                     if (remove(path.c_str()) == 0){
                         cout << "Disco eliminado correctamente" << endl;
                         return;
@@ -170,9 +168,8 @@ void disk::rmdisk(vector<string> tks){
 
 }
 
-int aux_value;
 //comando fdisk
-void disk::fdisk(vector<string> tks){
+void disk::fdisk(vector<string> tks){ 
     //inicializar variables
     string fit = "wf";
     string unit = "k";
@@ -187,61 +184,51 @@ void disk::fdisk(vector<string> tks){
     for (string token:tks){
         string tk = token.substr(0, token.find("="));
         token.erase(0,tk.length()+1);
-        if (Manager.lower(tk) == "fit"){
-            if (Manager.lower(token) == "bf" || Manager.lower(token) == "ff" || Manager.lower(token) == "wf"){
-                fit = Manager.lower(token);
+        if (lower(tk) == "fit"){
+            if (lower(token) == "bf" || lower(token) == "ff" || lower(token) == "wf"){
+                fit = lower(token);
             }else{
                 cout << "Parametro fit no valido" << endl; 
             }
-            cout << "fit: " << fit << endl;
-        }else if(Manager.lower(tk) == "unit"){
-            if (Manager.lower(token) == "b" || Manager.lower(token)  == "k" || Manager.lower(token) == "m"){
-                unit = Manager.lower(token);  
+        }else if(lower(tk) == "unit"){
+            if (lower(token) == "b" || lower(token)  == "k" || lower(token) == "m"){
+                unit = lower(token);  
             }else{
                 cout<< "Parametro unit no valido" << endl; 
             }
-            
-            cout << "unit: " << unit << endl;
-        }else if (Manager.lower(tk) == "size"){
+        }else if (lower(tk) == "size"){
             size = stoi(token);
             if( size <= 0){
                 cout << "Parametro size no valido" << endl;
                 return;
             }
-            cout << "size: " << size << endl;
-        }else if (Manager.lower(tk) == "path"){
+        }else if (lower(tk) == "path"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 path = token.substr(1, token.length() - 2);
             }else{
                 path = token;
             }
-
-            cout << "path: " << path << endl;
-        }else if (Manager.lower(tk) == "type") {
-            if (Manager.lower(token) == "p" || Manager.lower(token)  == "e" || Manager.lower(token) == "l"){
-                type = Manager.lower(token);
-                cout << "type: " << type << endl;
+        }else if (lower(tk) == "type") {
+            if (lower(token) == "p" || lower(token)  == "e" || lower(token) == "l"){
+                type = lower(token);
             }else{
                 cout<< "Parametro type no valido" << endl; 
             }
-        } else if (Manager.lower(tk) == "name") {
+        } else if (lower(tk) == "name") {
             if (token.substr(0, 1) == "\""){
                 name = token.substr(1, token.length() - 2);
             }else{
                 name = token;
             }
-            cout << "name: " << name << endl;
-        } else if (Manager.lower(tk) == "add") {
+        } else if (lower(tk) == "add") {
             add = stoi(token);
-            cout << "add: " << add << endl;
-        }else if (Manager.lower(tk) == "delete") {
-            if (Manager.lower(token) == "full"){
-                suprim = Manager.lower(token);  
+        }else if (lower(tk) == "delete") {
+            if (lower(token) == "full"){
+                suprim = lower(token);  
             }else{
                 cout<< "Parametro delete no valido" << endl; 
             }
-            cout << "delete: " << suprim << endl;
         }else{
             cout << "No se esperaba el parametro: " << tk << endl;
         }
@@ -279,7 +266,7 @@ void disk::fdisk(vector<string> tks){
 
                 for (Partition prttn : partitions) {
                     if (prttn.part_status == '1') {
-                        Stepper trn = {control, prttn.part_start, prttn.part_start + prttn.part_size, trn.start - base};
+                        Stepper trn = {control, prttn.part_start, prttn.part_start + prttn.part_s, trn.start - base};
                         base = trn.end;
 
                         if (used != 0) {
@@ -294,15 +281,15 @@ void disk::fdisk(vector<string> tks){
                         }
                     }
 
-                    if (used == 4 && Manager.lower(type) != "l") {
+                    if (used == 4 && lower(type) != "l") {
                         throw runtime_error("Limite de particiones alcanzado");
-                    } else if (ext == 1 && Manager.lower(type) == "e") {
+                    } else if (ext == 1 && lower(type) == "e") {
                         throw runtime_error("Solo se puede crear una particion Extendida");
                     }
                     control++;
                 }
 
-                if (ext == 0 && Manager.lower(type) == "l") {
+                if (ext == 0 && lower(type) == "l") {
                     throw runtime_error("No existe particion Extendida para crear la Logica");
                 }
                 if (used != 0) {
@@ -318,16 +305,16 @@ void disk::fdisk(vector<string> tks){
                 //primer marcador
                 Partition transition;
                 transition.part_status = '1';
-                transition.part_size = size;
+                transition.part_s = size;
                 transition.part_type = toupper(type[0]);
                 transition.part_fit = toupper(fit[0]);
                 strcpy(transition.part_name, name.c_str());
 
-                if (Manager.lower(type) == "l") {
+                if (lower(type) == "l") {
                     EBR nlogic;
                     nlogic.part_status = '1';
                     nlogic.part_fit = transition.part_fit;
-                    nlogic.part_size = transition.part_size;
+                    nlogic.part_s = transition.part_s;
                     nlogic.part_next = -1;
                     strcpy(nlogic.part_name, transition.part_name);
 
@@ -336,11 +323,11 @@ void disk::fdisk(vector<string> tks){
                     EBR tmp;
                     int s = 0;
                     while (fread(&tmp, sizeof(EBR), 1, file)) {
-                        s += sizeof(EBR) + tmp.part_size;
+                        s += sizeof(EBR) + tmp.part_s;
                         if (tmp.part_status == '0' && tmp.part_next == -1) {
                             nlogic.part_start = tmp.part_start;
-                            nlogic.part_next = nlogic.part_start + nlogic.part_size + sizeof(EBR);
-                            if ((extended.part_size - s) <= nlogic.part_size) {
+                            nlogic.part_next = nlogic.part_start + nlogic.part_s + sizeof(EBR);
+                            if ((extended.part_s - s) <= nlogic.part_s) {
                                 throw runtime_error("no hay espacio para más particiones lógicas");
                             }
                             fseek(file, nlogic.part_start, SEEK_SET);
@@ -375,20 +362,20 @@ void disk::fdisk(vector<string> tks){
                             continue;
                         }
 
-                        if (toupper(disco.disk_fit) == 'F') {
-                            if (toUse.before >= transition.part_size || toUse.after >= transition.part_size) {
+                        if (toupper(disco.dsk_fit) == 'F') {
+                            if (toUse.before >= transition.part_s || toUse.after >= transition.part_s) {
                                 break;
                             }
                             toUse = tr;
-                        } else if (toupper(disco.disk_fit) == 'B') {
-                            if (toUse.before < transition.part_size || toUse.after < transition.part_size) {
+                        } else if (toupper(disco.dsk_fit) == 'B') {
+                            if (toUse.before < transition.part_s || toUse.after < transition.part_s) {
                                 toUse = tr;
                             } else {
-                                if (tr.before >= transition.part_size || tr.after >= transition.part_size) {
-                                    int b1 = toUse.before - transition.part_size;
-                                    int a1 = toUse.after - transition.part_size;
-                                    int b2 = tr.before - transition.part_size;
-                                    int a2 = tr.after - transition.part_size;
+                                if (tr.before >= transition.part_s || tr.after >= transition.part_s) {
+                                    int b1 = toUse.before - transition.part_s;
+                                    int a1 = toUse.after - transition.part_s;
+                                    int b2 = tr.before - transition.part_s;
+                                    int a2 = tr.after - transition.part_s;
 
                                     if ((b1 < b2 && b1 < a2) || (a1 < b2 && a1 < a2)) {
                                         control++;
@@ -397,15 +384,15 @@ void disk::fdisk(vector<string> tks){
                                     toUse = tr;
                                 }
                             }
-                        } else if (toupper(disco.disk_fit) == 'W') {
-                            if (!(toUse.before >= transition.part_size) || !(toUse.after >= transition.part_size)) {
+                        } else if (toupper(disco.dsk_fit) == 'W') {
+                            if (!(toUse.before >= transition.part_s) || !(toUse.after >= transition.part_s)) {
                                 toUse = tr;
                             } else {
-                                if (tr.before >= transition.part_size || tr.after >= transition.part_size) {
-                                    int b1 = toUse.before - transition.part_size;
-                                    int a1 = toUse.after - transition.part_size;
-                                    int b2 = tr.before - transition.part_size;
-                                    int a2 = tr.after - transition.part_size;
+                                if (tr.before >= transition.part_s || tr.after >= transition.part_s) {
+                                    int b1 = toUse.before - transition.part_s;
+                                    int a1 = toUse.after - transition.part_s;
+                                    int b2 = tr.before - transition.part_s;
+                                    int a2 = tr.after - transition.part_s;
 
                                     if ((b1 > b2 && b1 > a2) || (a1 > b2 && a1 > a2)) {
                                         control++;
@@ -417,31 +404,31 @@ void disk::fdisk(vector<string> tks){
                         }
                         control++;
                     }
-                    if (toUse.before >= transition.part_size || toUse.after >= transition.part_size) {
-                        if (toupper(disco.disk_fit) == 'F') {
-                            if (toUse.before >= transition.part_size) {
+                    if (toUse.before >= transition.part_s || toUse.after >= transition.part_s) {
+                        if (toupper(disco.dsk_fit) == 'F') {
+                            if (toUse.before >= transition.part_s) {
                                 transition.part_start = (toUse.start - toUse.before);
                                 aux_value = transition.part_start;
                             } else {
                                 transition.part_start = toUse.end;
                                 aux_value = transition.part_start;
                             }
-                        } else if (toupper(disco.disk_fit) == 'B') {
-                            int b1 = toUse.before - transition.part_size;
-                            int a1 = toUse.after - transition.part_size;
+                        } else if (toupper(disco.dsk_fit) == 'B') {
+                            int b1 = toUse.before - transition.part_s;
+                            int a1 = toUse.after - transition.part_s;
 
-                            if ((toUse.before >= transition.part_size && b1 < a1) || !(toUse.after >= transition.part_start)) {
+                            if ((toUse.before >= transition.part_s && b1 < a1) || !(toUse.after >= transition.part_start)) {
                                 transition.part_start = (toUse.start - toUse.before);
                                 aux_value = transition.part_start;
                             } else {
                                 transition.part_start = toUse.end;
                                 aux_value = transition.part_start;
                             }
-                        } else if (toupper(disco.disk_fit) == 'W') {
-                            int b1 = toUse.before - transition.part_size;
-                            int a1 = toUse.after - transition.part_size;
+                        } else if (toupper(disco.dsk_fit) == 'W') {
+                            int b1 = toUse.before - transition.part_s;
+                            int a1 = toUse.after - transition.part_s;
 
-                            if ((toUse.before >= transition.part_size && b1 > a1) || !(toUse.after >= transition.part_start)) {
+                            if ((toUse.before >= transition.part_s && b1 > a1) || !(toUse.after >= transition.part_start)) {
                                 transition.part_start = (toUse.start - toUse.before);
                                 aux_value = transition.part_start;
                             } else {
@@ -497,7 +484,7 @@ void disk::fdisk(vector<string> tks){
                 if (bfile != NULL) {
                     fseek(bfile, 0, SEEK_SET);
                     fwrite(&disco, sizeof(MBR), 1, bfile);
-                    if (Manager.lower(type) == "e") {
+                    if (lower(type) == "e") {
                         EBR ebr;
                         ebr.part_start = aux_value;
                         fseek(bfile, aux_value, SEEK_SET);
@@ -547,22 +534,22 @@ void disk::fdisk(vector<string> tks){
 
                 for (int i = 0; i < 4; i++) {
                     if (partitions[i].part_status == '1') {
-                        if (Manager.lower(partitions[i].part_name) == Manager.lower(name)) {
-                            if ((partitions[i].part_size + (add)) > 0) {
+                        if (lower(partitions[i].part_name) == lower(name)) {
+                            if ((partitions[i].part_s + (add)) > 0) {
                                 if (i != 3) {
                                     if (partitions[i + 1].part_start != 0) {
-                                        if (((partitions[i].part_size + (add) +
+                                        if (((partitions[i].part_s + (add) +
                                             partitions[i].part_start) <=
                                             partitions[i + 1].part_start)) {
-                                            partitions[i].part_size += add;
+                                            partitions[i].part_s += add;
                                             break;
                                         } else {
                                             throw runtime_error("se sobrepasa el límite");
                                         }
                                     }
                                 }
-                                if ((partitions[i].part_size + add + partitions[i].part_start) <= disk.mbr_tamano) {
-                                    partitions[i].part_size += add;
+                                if ((partitions[i].part_s + add + partitions[i].part_start) <= disk.mbr_tamano) {
+                                    partitions[i].part_s += add;
                                     break;
                                 } else {
                                     throw runtime_error("se sobrepasa el límite");
@@ -616,14 +603,14 @@ void disk::fdisk(vector<string> tks){
             for (int i = 0; i < 4; i++) {
                 if (partitions[i].part_status == '1') {
                     if (partitions[i].part_type == 'p') {
-                        if (Manager.lower(partitions[i].part_name) == Manager.lower(name)) {
+                        if (lower(partitions[i].part_name) == lower(name)) {
                             past = partitions[i];
                             partitions[i] = Partition();
                             fll = true;
                             break;
                         }
                     } else {
-                        if (Manager.lower(partitions[i].part_name) == Manager.lower(name)) {
+                        if (lower(partitions[i].part_name) == lower(name)) {
                             past = partitions[i];
                             partitions[i] = Partition();
                             fll = true;
@@ -632,7 +619,7 @@ void disk::fdisk(vector<string> tks){
                         vector<EBR> ebrs = get_type_logic(partitions[i], path);
                         int count = 0;
                         for (EBR ebr : ebrs) {
-                            if (Manager.lower(ebr.part_name) == Manager.lower(name)) {
+                            if (lower(ebr.part_name) == lower(name)) {
                                 ebr.part_status = '0';
                             }
                             fseek(file, ebr.part_start, SEEK_SET);
@@ -665,7 +652,7 @@ void disk::fdisk(vector<string> tks){
             fwrite(&disk, sizeof(MBR), 1, file);
             if (fll) {
                 fseek(file, past.part_start, SEEK_SET);
-                int num = static_cast<int>(past.part_size / 2);
+                int num = static_cast<int>(past.part_s / 2);
                 fwrite("\0", sizeof("\0"), num, file);
             }
             cout << ">FDISK: partición eliminada correctamente " << endl;
@@ -678,7 +665,6 @@ void disk::fdisk(vector<string> tks){
     }
 }
 
-Mounted_D mountd[99];
 //comando mount
 void disk::mount(vector<string> tks) {
     string path = "";
@@ -689,7 +675,7 @@ void disk::mount(vector<string> tks) {
     for (string token:tks){
         string tk = token.substr(0, token.find("="));
         token.erase(0,tk.length()+1);
-        if (Manager.lower(tk) == "path"){
+        if (lower(tk) == "path"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 path = token.substr(1, token.length() - 2);
@@ -697,11 +683,11 @@ void disk::mount(vector<string> tks) {
                 path = token;
             }
             //verificar extension del archivo.dsk
-            if(Manager.lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
+            if(lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
                 cout << "Error: Extensión de archivo no valida" << endl;
                 return;
             }
-        }else if (Manager.lower(tk) == "name"){
+        }else if (lower(tk) == "name"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 name = token.substr(1, token.length() - 2);
@@ -712,7 +698,7 @@ void disk::mount(vector<string> tks) {
     }
 
     if (tks.empty()) {
-        mounted();
+        show_mounted();
         return;
     }
 
@@ -793,7 +779,7 @@ void disk::unmount(vector<string> tks) {
     for (string token:tks){
         string tk = token.substr(0, token.find("="));
         token.erase(0,tk.length()+1);
-        if (Manager.lower(tk) == "id"){
+        if (lower(tk) == "id"){
             //si trae comillas extraerlas
             if (token.substr(0, 1) == "\""){
                 id = token.substr(1, token.length() - 2);
@@ -808,7 +794,7 @@ void disk::unmount(vector<string> tks) {
             for (int j = 0; j < 99; j++) {
                 if (mountd[i].mounted_p[j].status == '1') {
                     if (mountd[i].mounted_p[j].id == id) {
-                        Mounted_P mp = Mounted_P();
+                        MPartition mp = MPartition();
                         mountd[i].mounted_p[j] = mp;
                         cout << "se ha realizado correctamente el unmount id=" << id << endl;
                         return;
@@ -824,8 +810,392 @@ void disk::unmount(vector<string> tks) {
     }
 }
 
-//comando para mostrar particiones montadas
-void disk::mounted() {
+//comando mkfs
+void disk::mkfs(vector<string> tks) {
+    string path;
+    string id;
+    string type = "Full";
+    string fs = "2fs";
+
+    //extraer parametros
+    for (string token:tks){
+        string tk = token.substr(0, token.find("="));
+        token.erase(0,tk.length()+1);
+        if (lower(tk) == "id"){
+            //si trae comillas extraerlas
+            if (token.substr(0, 1) == "\""){
+                id = token.substr(1, token.length() - 2);
+            }else{
+                id = token;
+            }
+        }else if(lower(tk) == "type"){
+            //si trae comillas extraerlas
+            if (token.substr(0, 1) == "\""){
+                type = token.substr(1, token.length() - 2);
+            }else{
+                type = token;
+            }
+            if (!(lower(type) == "fast"|| lower(type) == "full")) {
+            throw runtime_error("valor de type no válido");
+            }
+        }else if (lower(tk) == "fs"){
+            //si trae comillas extraerlas
+            if (token.substr(0, 1) == "\""){
+                fs = token.substr(1, token.length() - 2);
+            }else{
+                fs = token;
+            }
+            if (!(lower(fs) == "2fs"|| lower(fs) == "3fs")) {
+            throw runtime_error("valor de fs no válido");
+            }
+        }
+    }
+
+
+    try {
+
+        Partition partition = get_mount(id, &path);
+
+        int n;
+        if (lower(fs) == "2fs") {
+            n = floor((partition.part_s - sizeof(Superblock)) / (sizeof(Inodes) + 3 * sizeof(Fileblock)));
+        } else {
+            n = floor((partition.part_s - sizeof(Superblock)) / (sizeof(Journaling) + sizeof(Inodes) + 3 * sizeof(Fileblock) + 1));
+        }
+
+        Superblock spr;
+        spr.s_inodes_count = n;
+        spr.s_free_inodes_count = n;
+        spr.s_blocks_count = 3 * n;
+        spr.s_free_blocks_count = 3 * n;
+        spr.s_mtime = time(nullptr);
+        spr.s_umtime = time(nullptr);
+        spr.s_mnt_count = 1;
+        if (lower(fs) =="2fs") {
+            //sistema de archivos ext2
+            spr.s_filesystem_type = 2;
+            spr.s_bm_inode_start = partition.part_start + sizeof(Superblock);
+            spr.s_bm_block_start = spr.s_bm_inode_start + n;
+            spr.s_inode_start = spr.s_bm_block_start + (3 * n);
+            spr.s_block_start = spr.s_inode_start + (n * sizeof(Inodes));
+
+            FILE *bfile = fopen(path.c_str(), "rb+");
+            fseek(bfile, partition.part_start, SEEK_SET);
+            fwrite(&spr, sizeof(Superblock), 1, bfile);
+
+            char zero = '0';
+            fseek(bfile, spr.s_bm_inode_start, SEEK_SET);
+            for (int i = 0; i < n; i++) {
+                fwrite(&zero, sizeof(zero), 1, bfile);
+            }
+
+            fseek(bfile, spr.s_bm_block_start, SEEK_SET);
+            for (int i = 0; i < (3 * n); i++) {
+                fwrite(&zero, sizeof(zero), 1, bfile);
+            }
+
+            Inodes inode;
+            fseek(bfile, spr.s_inode_start, SEEK_SET);
+            for (int i = 0; i < n; i++) {
+                fwrite(&inode, sizeof(Inodes), 1, bfile);
+            }
+
+            Folderblock folder;
+            fseek(bfile, spr.s_block_start, SEEK_SET);
+            for (int i = 0; i < (3 * n); i++) {
+                fwrite(&folder, sizeof(Folderblock), 1, bfile);
+            }
+            fclose(bfile);
+
+            Superblock recuperado;
+            FILE *archivo = fopen(path.c_str(), "rb");
+            fseek(archivo, partition.part_start, SEEK_SET);
+            fread(&recuperado, sizeof(Superblock), 1, archivo);
+            fclose(archivo);
+            inode.i_uid = 1;
+            inode.i_gid = 1;
+            inode.i_s = 0;
+            inode.i_atime = spr.s_umtime;
+            inode.i_ctime = spr.s_umtime;
+            inode.i_mtime = spr.s_umtime;
+            inode.i_type = 0;
+            inode.i_perm = 664;
+            inode.i_block[0] = 0;
+
+            Folderblock fb;
+            strcpy(fb.b_content[0].b_name, ".");
+            fb.b_content[0].b_inodo = 0;
+            strcpy(fb.b_content[1].b_name, "..");
+            fb.b_content[1].b_inodo = 0;
+            strcpy(fb.b_content[2].b_name, "users.txt");
+            fb.b_content[2].b_inodo = 1;
+
+            string data = "1,G,root\n1,U,root,root,123\n";
+            Inodes inodetmp;
+            inodetmp.i_uid = 1;
+            inodetmp.i_gid = 1;
+            inodetmp.i_s = sizeof(data.c_str()) + sizeof(Folderblock);
+            inodetmp.i_atime = spr.s_umtime;
+            inodetmp.i_ctime = spr.s_umtime;
+            inodetmp.i_mtime = spr.s_umtime;
+            inodetmp.i_block[0] = -1;
+            inodetmp.i_type = 1;
+            inodetmp.i_perm = 664;
+            
+
+            inode.i_s = inodetmp.i_s + sizeof(Folderblock) + sizeof(Inodes);
+
+            Fileblock fileb;
+            strcpy(fileb.b_content, data.c_str());
+
+            FILE *bfiles = fopen(path.c_str(), "rb+");
+            fseek(bfiles, spr.s_bm_inode_start, SEEK_SET);
+            char caracter = '1';
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+
+            fseek(bfiles, spr.s_bm_block_start, SEEK_SET);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+
+            fseek(bfiles, spr.s_inode_start, SEEK_SET);
+            fwrite(&inode, sizeof(Inodes), 1, bfiles);
+            fwrite(&inodetmp, sizeof(Inodes), 1, bfiles);
+
+            fseek(bfiles, spr.s_block_start, SEEK_SET);
+            fwrite(&fb, sizeof(Folderblock), 1, bfiles);
+            fwrite(&fileb, sizeof(Fileblock), 1, bfiles);
+            fclose(bfiles);
+
+        } else {
+            //sisteme de archivos ext3
+            spr.s_filesystem_type = 3;
+            spr.s_bm_inode_start = partition.part_start + sizeof(Superblock) + (n * sizeof(Journaling));
+            spr.s_bm_block_start = spr.s_bm_inode_start + n;
+            spr.s_inode_start = spr.s_bm_block_start + (3 * n);
+            spr.s_block_start = spr.s_inode_start + (n * sizeof(Inodes));
+
+            FILE *bfile = fopen(path.c_str(), "rb+");
+            fseek(bfile, partition.part_start, SEEK_SET);
+            fwrite(&spr, sizeof(Superblock), 1, bfile);
+
+            Journaling journaling;
+            for (int i = 0; i < n; i++) {
+                fwrite(&journaling, sizeof(Journaling), 1, bfile);
+            }
+
+            char zero = '0';
+            fseek(bfile, spr.s_bm_inode_start, SEEK_SET);
+            for (int i = 0; i < n; i++) {
+                fwrite(&zero, sizeof(zero), 1, bfile);
+            }
+
+            fseek(bfile, spr.s_bm_block_start, SEEK_SET);
+            for (int i = 0; i < (3 * n); i++) {
+                fwrite(&zero, sizeof(zero), 1, bfile);
+            }
+
+            Inodes inode;
+            fseek(bfile, spr.s_inode_start, SEEK_SET);
+            for (int i = 0; i < n; i++) {
+                fwrite(&inode, sizeof(Inodes), 1, bfile);
+            }
+
+            Folderblock folder;
+            fseek(bfile, spr.s_block_start, SEEK_SET);
+            for (int i = 0; i < (3 * n); i++) {
+                fwrite(&folder, sizeof(Folderblock), 1, bfile);
+            }
+            fclose(bfile);
+
+            Superblock recuperado;
+            FILE *archivo = fopen(path.c_str(), "rb");
+            fseek(archivo, partition.part_start, SEEK_SET);
+            fread(&recuperado, sizeof(Superblock), 1, archivo);
+            fclose(archivo);
+
+            inode.i_uid = 1;
+            inode.i_gid = 1;
+            inode.i_s = 0;
+            inode.i_atime = spr.s_umtime;
+            inode.i_ctime = spr.s_umtime;
+            inode.i_mtime = spr.s_umtime;
+            inode.i_type = 0;
+            inode.i_perm = 664;
+            inode.i_block[0] = 0;
+
+            strcpy(journaling.content, "carpeta principal");
+            strcpy(journaling.path, "/");
+            journaling.type = 0;
+            strcpy(journaling.operation, "mkdir");
+            journaling.date = spr.s_umtime;
+
+            Folderblock fb;
+            strcpy(fb.b_content[0].b_name, ".");
+            fb.b_content[0].b_inodo = 0;
+            strcpy(fb.b_content[1].b_name, "..");
+            fb.b_content[1].b_inodo = 0;
+            strcpy(fb.b_content[2].b_name, "users.txt");
+            fb.b_content[2].b_inodo = 1;
+
+            string data = "1,G,root\n1,U,root,root,123\n";
+            Inodes inodetmp;
+            inodetmp.i_uid = 1;
+            inodetmp.i_gid = 1;
+            inodetmp.i_s = sizeof(data.c_str()) + sizeof(Folderblock);
+            inodetmp.i_atime = spr.s_umtime;
+            inodetmp.i_ctime = spr.s_umtime;
+            inodetmp.i_mtime = spr.s_umtime;
+            inodetmp.i_block[0] = -1;
+            inodetmp.i_type = 1;
+            inodetmp.i_perm = 664;
+            
+
+            inode.i_s = inodetmp.i_s + sizeof(Folderblock) + sizeof(Inodes);
+
+            Journaling joutmp;
+            strcpy(joutmp.content, data.c_str());
+            strcpy(joutmp.path, "/users.txt");
+            joutmp.type = 1;
+            joutmp.size = sizeof(data) + sizeof(Folderblock);
+            strcpy(joutmp.operation, "mkfl");
+            joutmp.date = spr.s_umtime;
+
+            Fileblock fileb;
+            strcpy(fileb.b_content, data.c_str());
+
+            FILE *bfiles = fopen(path.c_str(), "rb+");
+
+            fseek(bfiles, partition.part_start+ sizeof(Superblock), SEEK_SET);
+            fwrite(&journaling, sizeof(Journaling), 1, bfiles);
+            fwrite(&joutmp, sizeof(Journaling), 1, bfiles);
+
+            fseek(bfiles, spr.s_bm_inode_start, SEEK_SET);
+            char caracter = '1';
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+
+            fseek(bfiles, spr.s_bm_block_start, SEEK_SET);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+            fwrite(&caracter, sizeof(caracter), 1, bfiles);
+
+            fseek(bfiles, spr.s_inode_start, SEEK_SET);
+            fwrite(&inode, sizeof(Inodes), 1, bfiles);
+            fwrite(&inodetmp, sizeof(Inodes), 1, bfiles);
+
+            fseek(bfiles, spr.s_block_start, SEEK_SET);
+            fwrite(&fb, sizeof(Folderblock), 1, bfiles);
+            fwrite(&fileb, sizeof(Fileblock), 1, bfiles);
+            fclose(bfiles);
+        }
+
+        cout << "MKFS formateo realizado con éxito" << endl;
+    }
+    catch (invalid_argument &e) {
+        cout << "identificador de disco incorrecto" << endl;
+        return;
+    }
+    catch (exception &e) {
+        cout << e.what() << endl;
+        return;
+    }
+}
+
+//funcion para obetener las particiones montadas
+Partition disk::get_mount(string id, string *path) {
+    for (int i = 0; i < 99; i++){
+        for (int j = 0; j < 99; j++) {
+            if (mountd[i].mounted_p[j].status == '1') {
+                if (mountd[i].mounted_p[j].id == id) {
+                    FILE *validate = fopen(mountd[i].path, "r");
+                    if (validate == NULL) {
+                        throw runtime_error("disco no existente");
+                    }
+                    MBR disk;
+                    rewind(validate);
+                    fread(&disk, sizeof(MBR), 1, validate);
+                    fclose(validate);
+                    *path = mountd[i].path;
+                    return tracker(disk, mountd[i].mounted_p[j].name, mountd[i].path);
+                }
+            }
+        }
+    }
+    throw runtime_error("id no existente ");
+
+}
+
+//funcion para obtener particion
+Partition disk::tracker(MBR mbr, string name, string path) {
+    Partition partitions[4];
+    partitions[0] = mbr.mbr_Partition_1;
+    partitions[1] = mbr.mbr_Partition_2;
+    partitions[2] = mbr.mbr_Partition_3;
+    partitions[3] = mbr.mbr_Partition_4;
+
+    for (auto &partition : partitions) {
+        if (partition.part_status == '1') {
+            if (lower(partition.part_name) == lower(name)) {
+                return partition;
+            } else if (partition.part_type == 'e') {
+                vector<EBR> ebrs = get_type_logic(partition, path);
+                for (EBR ebr : ebrs) {
+                    if (ebr.part_status == '1') {
+                        if (lower(ebr.part_name) == lower(name)) {
+                            Partition tmp;
+                            tmp.part_status = '1';
+                            tmp.part_type = 'l';
+                            tmp.part_fit = ebr.part_fit;
+                            tmp.part_start = ebr.part_start;
+                            tmp.part_s = ebr.part_s;
+                            strcpy(tmp.part_name, ebr.part_name);
+                            return tmp;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    throw runtime_error("la partición no existe");
+}
+
+//funcion para obtener particiones logicas
+vector<EBR> disk::get_type_logic(Partition partition, string path) {
+    vector<EBR> ebrs;
+
+    FILE* file = fopen(path.c_str(), "rb+");
+    if (!file) {
+        return ebrs;
+    }
+
+    fseek(file, partition.part_start, SEEK_SET);
+    EBR tmp;
+
+    while (fread(&tmp, sizeof(EBR), 1, file) == 1) {
+        if (tmp.part_status != '0') {
+            ebrs.push_back(tmp);
+        }
+        if (tmp.part_next == -1) {
+            break;
+        }
+        fseek(file, tmp.part_next, SEEK_SET);
+    }
+    fclose(file);
+    return ebrs;
+}
+
+//Funcion para convertir a minusculas
+string disk::lower(string String){
+    string aux;
+    locale loc;
+    for (int i = 0; i < String.length(); i++){
+        aux += tolower(String[i], loc);
+    }
+    return aux;
+}
+
+//funcion para mostrar particiones montadas
+void disk::show_mounted() {
     system("clear"); 
     cout << "Listado de particiones montadas" << endl;
     for (int i = 0; i < 99; i++) {
@@ -859,14 +1229,14 @@ void disk::rep(){
         cout << "   MBR" << endl;
         cout << "Tamaño del disco:  "<< discoI.mbr_tamano << endl;
         cout << "Fecha de creacion:  "<< mostrar_fecha << endl;
-        cout << "Disk Signature:  "<< discoI.mbr_disk_signature << endl;
+        cout << "Disk Signature:  "<< discoI.mbr_dsk_signature << endl;
         cout << "Tamano del ebbr:  "<< sizeof(EBR) << endl;
 
         if(discoI.mbr_Partition_1.part_status == '1'){
             cout << "   Particion 1 " << endl;
             cout << " Nombre:  "<< discoI.mbr_Partition_1.part_name<<endl;
             cout << " Tipo:  "<< discoI.mbr_Partition_1.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_1.part_size<<endl;
+            cout << " Tamaño:  "<< discoI.mbr_Partition_1.part_s<<endl;
             cout << " Inicio:  "<< discoI.mbr_Partition_1.part_start<<endl;
             cout << " Status: " << discoI.mbr_Partition_1.part_status<<endl;
             if (discoI.mbr_Partition_1.part_type == 'E'){
@@ -875,7 +1245,7 @@ void disk::rep(){
                 for(EBR ebr : ebrs){
                     cout << "   EBR" << endl;
                     cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_size<<endl;
+                    cout << " Tamaño:  "<< ebr.part_s<<endl;
                     cout << " Inicio:  "<< ebr.part_start<<endl;
                     cout << " Status: " << ebr.part_status<<endl;
                     cout << " Next: " << ebr.part_next<<endl;
@@ -888,7 +1258,7 @@ void disk::rep(){
             cout << "   Particion 2 " << endl;
             cout << " Nombre:  "<< discoI.mbr_Partition_2.part_name<<endl;
             cout << " Tipo:  "<< discoI.mbr_Partition_2.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_2.part_size<<endl;
+            cout << " Tamaño:  "<< discoI.mbr_Partition_2.part_s<<endl;
             cout << " Inicio:  "<< discoI.mbr_Partition_2.part_start<<endl;
             cout << " Status: " << discoI.mbr_Partition_2.part_status<<endl;
             if (discoI.mbr_Partition_2.part_type == 'E'){
@@ -897,7 +1267,7 @@ void disk::rep(){
                 for(EBR ebr : ebrs){
                     cout << "   EBR" << endl;
                     cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_size<<endl;
+                    cout << " Tamaño:  "<< ebr.part_s<<endl;
                     cout << " Inicio:  "<< ebr.part_start<<endl;
                     cout << " Status: " << ebr.part_status<<endl;
                     cout << " Next: " << ebr.part_next<<endl;
@@ -909,7 +1279,7 @@ void disk::rep(){
             cout << "   Particion 3 " << endl;
             cout << " Nombre:  "<< discoI.mbr_Partition_3.part_name<<endl;
             cout << " Tipo:  "<< discoI.mbr_Partition_3.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_3.part_size<<endl;
+            cout << " Tamaño:  "<< discoI.mbr_Partition_3.part_s<<endl;
             cout << " Inicio:  "<< discoI.mbr_Partition_3.part_start<<endl;
             cout << " Status: " << discoI.mbr_Partition_3.part_status<<endl;
             if (discoI.mbr_Partition_3.part_type == 'E'){
@@ -918,7 +1288,7 @@ void disk::rep(){
                 for(EBR ebr : ebrs){
                     cout << "   EBR" << endl;
                     cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_size<<endl;
+                    cout << " Tamaño:  "<< ebr.part_s<<endl;
                     cout << " Inicio:  "<< ebr.part_start<<endl;
                     cout << " Status: " << ebr.part_status<<endl;
                     cout << " Next: " << ebr.part_next<<endl;
@@ -930,7 +1300,7 @@ void disk::rep(){
             cout << "   Particion 4 " << endl;
             cout << " Nombre:  "<< discoI.mbr_Partition_4.part_name<<endl;
             cout << " Tipo:  "<< discoI.mbr_Partition_4.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_4.part_size<<endl;
+            cout << " Tamaño:  "<< discoI.mbr_Partition_4.part_s<<endl;
             cout << " Inicio:  "<< discoI.mbr_Partition_4.part_start<<endl;
             cout << " Status: " << discoI.mbr_Partition_4.part_status<<endl;
             if (discoI.mbr_Partition_4.part_type == 'E'){
@@ -939,7 +1309,7 @@ void disk::rep(){
                 for(EBR ebr : ebrs){
                     cout << "   EBR" << endl;
                     cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_size<<endl;
+                    cout << " Tamaño:  "<< ebr.part_s<<endl;
                     cout << " Inicio:  "<< ebr.part_start<<endl;
                     cout << " Status: " << ebr.part_status<<endl;
                     cout << " Next: " << ebr.part_next<<endl;
@@ -949,63 +1319,4 @@ void disk::rep(){
         
     }
     fclose(imprimir);
-}
-
-
-
-Partition disk::tracker(MBR mbr, string name, string path) {
-    Partition partitions[4];
-    partitions[0] = mbr.mbr_Partition_1;
-    partitions[1] = mbr.mbr_Partition_2;
-    partitions[2] = mbr.mbr_Partition_3;
-    partitions[3] = mbr.mbr_Partition_4;
-
-    for (auto &partition : partitions) {
-        if (partition.part_status == '1') {
-            if (Manager.lower(partition.part_name) == Manager.lower(name)) {
-                return partition;
-            } else if (partition.part_type == 'e') {
-                vector<EBR> ebrs = get_type_logic(partition, path);
-                for (EBR ebr : ebrs) {
-                    if (ebr.part_status == '1') {
-                        if (Manager.lower(ebr.part_name) == Manager.lower(name)) {
-                            Partition tmp;
-                            tmp.part_status = '1';
-                            tmp.part_type = 'l';
-                            tmp.part_fit = ebr.part_fit;
-                            tmp.part_start = ebr.part_start;
-                            tmp.part_size = ebr.part_size;
-                            strcpy(tmp.part_name, ebr.part_name);
-                            return tmp;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    throw runtime_error("la partición no existe");
-}
-
-vector<EBR> disk::get_type_logic(Partition partition, string path) {
-    vector<EBR> ebrs;
-
-    FILE* file = fopen(path.c_str(), "rb+");
-    if (!file) {
-        return ebrs;
-    }
-
-    fseek(file, partition.part_start, SEEK_SET);
-    EBR tmp;
-
-    while (fread(&tmp, sizeof(EBR), 1, file) == 1) {
-        if (tmp.part_status != '0') {
-            ebrs.push_back(tmp);
-        }
-        if (tmp.part_next == -1) {
-            break;
-        }
-        fseek(file, tmp.part_next, SEEK_SET);
-    }
-    fclose(file);
-    return ebrs;
 }

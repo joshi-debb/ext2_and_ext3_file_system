@@ -2,29 +2,27 @@
 #ifndef DISK_H
 #define DISK_H
 
-#include "../headers/disk.h"
-#include "../headers/manager.h"
 
-#include<vector>
 #include <string>
-#include <algorithm>
+#include<vector>
 
+
+using namespace std;
 
 struct Partition {
     char part_status = '0';
     char part_type;
     char part_fit;
     int part_start = -1;
-    int part_size = 0;
+    int part_s = 0;
     char part_name[16];
-    int part_number = -1;
 };
 
 struct MBR{
     int mbr_tamano;
     time_t mbr_fecha_creacion;
-    int mbr_disk_signature;
-    char disk_fit;
+    int mbr_dsk_signature;
+    char dsk_fit;
     Partition mbr_Partition_1;
     Partition mbr_Partition_2;
     Partition mbr_Partition_3;
@@ -35,8 +33,8 @@ struct EBR{
     char part_status = '0';
     char part_fit;
     int part_start;
-    int part_size = 0;
-    int part_next = -1; 
+    int part_s = 0;
+    int part_next = -1;
     char part_name[16];
 };
 
@@ -48,19 +46,77 @@ struct Stepper {
     int after;
 };
 
-struct Mounted_P{
+
+struct MPartition {
     char id[20];
     char name[20];
     char status = '0';
 };
 
-struct Mounted_D{
+struct MDisk {
     char path[150];
     char status = '0';
-    Mounted_P mounted_p[99];
+    MPartition mounted_p[99];
 };
 
-using namespace std;
+typedef struct _Content {
+    char b_name[12];
+    int b_inodo = -1;
+} Content;
+
+struct Folderblock{
+    Content b_content[4];
+};
+
+
+struct Inodes {
+    int i_uid = -1;
+    int i_gid = -1;
+    int i_s = -1;
+    time_t i_atime;
+    time_t i_ctime;
+    time_t i_mtime;
+    int i_block[15] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+    char i_type = -1;
+    int i_perm = -1;
+};
+
+struct Superblock {
+    int s_filesystem_type;
+    int s_inodes_count;
+    int s_blocks_count;
+    int s_free_blocks_count;
+    int s_free_inodes_count;
+    time_t s_mtime;
+    time_t s_umtime;
+    int s_mnt_count;
+    int s_magic = 0xEF53;
+    int s_inode_s = sizeof(Inodes);
+    int s_block_s = sizeof(Folderblock);
+    int s_fist_ino = 0;
+    int s_first_blo = 0;
+    int s_bm_inode_start;
+    int s_bm_block_start;
+    int s_inode_start;
+    int s_block_start;
+};
+
+struct Fileblock{
+    char b_content[64];
+};
+
+struct Pointerblock{
+    int b_pointers[16] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+};
+
+struct Journaling {
+    char operation[10] = "";
+    char type = -1;
+    char path[100] = "";
+    char content[60] = "";
+    time_t date;
+    int size = 0;
+};
 
 class disk{
 
@@ -71,10 +127,18 @@ class disk{
         void fdisk(vector<string> tks);
         void mount(vector<string> tks);
         void unmount(vector<string> tks);
-        void mounted();
+        void mkfs(vector<string> tks);
         void rep();
+        
+        Partition get_mount(string id, string *path);
+    
+    private:
         Partition tracker(MBR mbr, string name, string path);
         vector<EBR> get_type_logic(Partition partition, string path);
+        string lower(string str);
+        void show_mounted();
+        MDisk mountd[99];
+        int aux_value;
 
 };
 
