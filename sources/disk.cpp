@@ -1027,6 +1027,7 @@ void disk::mkfs(vector<string> tks) {
             strcpy(journaling.content, "carpeta root");
             strcpy(journaling.path, "/");
             journaling.type = 0;
+            journaling.size = sizeof(Folderblock);
             strcpy(journaling.operation, "mkdir");
             journaling.date = spr.s_umtime;
 
@@ -1205,118 +1206,4 @@ void disk::show_mounted() {
             }
         }
     }
-}
-
-//comando rep
-void disk::rep(){
-
-    cout<< ">REP" << endl;
-
-    string path = "/home/why/Desktop/Disco1.dsk";
-
-    FILE *imprimir = fopen(path.c_str(), "r");
-    if(imprimir!=NULL){
-
-        MBR discoI;
-        fseek(imprimir, 0, SEEK_SET);
-        fread(&discoI,sizeof(MBR), 1,imprimir);
-
-        struct tm *tm;
-        tm = localtime(&discoI.mbr_fecha_creacion);
-        char mostrar_fecha [20];
-        strftime(mostrar_fecha, 20, "%Y/%m/%d %H:%M:%S", tm);
-
-        cout << "   MBR" << endl;
-        cout << "Tamaño del disco:  "<< discoI.mbr_tamano << endl;
-        cout << "Fecha de creacion:  "<< mostrar_fecha << endl;
-        cout << "Disk Signature:  "<< discoI.mbr_dsk_signature << endl;
-        cout << "Tamano del ebbr:  "<< sizeof(EBR) << endl;
-
-        if(discoI.mbr_Partition_1.part_status == '1'){
-            cout << "   Particion 1 " << endl;
-            cout << " Nombre:  "<< discoI.mbr_Partition_1.part_name<<endl;
-            cout << " Tipo:  "<< discoI.mbr_Partition_1.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_1.part_s<<endl;
-            cout << " Inicio:  "<< discoI.mbr_Partition_1.part_start<<endl;
-            cout << " Status: " << discoI.mbr_Partition_1.part_status<<endl;
-            if (discoI.mbr_Partition_1.part_type == 'E'){
-                cout << "particion logicas:  "<< endl;
-                vector<EBR> ebrs = get_type_logic(discoI.mbr_Partition_1, path);
-                for(EBR ebr : ebrs){
-                    cout << "   EBR" << endl;
-                    cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_s<<endl;
-                    cout << " Inicio:  "<< ebr.part_start<<endl;
-                    cout << " Status: " << ebr.part_status<<endl;
-                    cout << " Next: " << ebr.part_next<<endl;
-                }
-            }
-            
-        }
-
-        if(discoI.mbr_Partition_2.part_status == '1'){
-            cout << "   Particion 2 " << endl;
-            cout << " Nombre:  "<< discoI.mbr_Partition_2.part_name<<endl;
-            cout << " Tipo:  "<< discoI.mbr_Partition_2.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_2.part_s<<endl;
-            cout << " Inicio:  "<< discoI.mbr_Partition_2.part_start<<endl;
-            cout << " Status: " << discoI.mbr_Partition_2.part_status<<endl;
-            if (discoI.mbr_Partition_2.part_type == 'E'){
-                cout << "particion logicas:  "<< endl;
-                vector<EBR> ebrs = get_type_logic(discoI.mbr_Partition_1, path);
-                for(EBR ebr : ebrs){
-                    cout << "   EBR" << endl;
-                    cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_s<<endl;
-                    cout << " Inicio:  "<< ebr.part_start<<endl;
-                    cout << " Status: " << ebr.part_status<<endl;
-                    cout << " Next: " << ebr.part_next<<endl;
-                }
-            }
-        }
-        
-        if(discoI.mbr_Partition_3.part_status == '1'){
-            cout << "   Particion 3 " << endl;
-            cout << " Nombre:  "<< discoI.mbr_Partition_3.part_name<<endl;
-            cout << " Tipo:  "<< discoI.mbr_Partition_3.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_3.part_s<<endl;
-            cout << " Inicio:  "<< discoI.mbr_Partition_3.part_start<<endl;
-            cout << " Status: " << discoI.mbr_Partition_3.part_status<<endl;
-            if (discoI.mbr_Partition_3.part_type == 'E'){
-                cout << "particion logicas:  "<< endl;
-                vector<EBR> ebrs = get_type_logic(discoI.mbr_Partition_1, path);
-                for(EBR ebr : ebrs){
-                    cout << "   EBR" << endl;
-                    cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_s<<endl;
-                    cout << " Inicio:  "<< ebr.part_start<<endl;
-                    cout << " Status: " << ebr.part_status<<endl;
-                    cout << " Next: " << ebr.part_next<<endl;
-                }
-            }
-        }
-
-        if(discoI.mbr_Partition_4.part_status == '1'){
-            cout << "   Particion 4 " << endl;
-            cout << " Nombre:  "<< discoI.mbr_Partition_4.part_name<<endl;
-            cout << " Tipo:  "<< discoI.mbr_Partition_4.part_type<<endl;
-            cout << " Tamaño:  "<< discoI.mbr_Partition_4.part_s<<endl;
-            cout << " Inicio:  "<< discoI.mbr_Partition_4.part_start<<endl;
-            cout << " Status: " << discoI.mbr_Partition_4.part_status<<endl;
-            if (discoI.mbr_Partition_4.part_type == 'E'){
-                cout << "particion logicas:  "<< endl;
-                vector<EBR> ebrs = get_type_logic(discoI.mbr_Partition_1, path);
-                for(EBR ebr : ebrs){
-                    cout << "   EBR" << endl;
-                    cout << " Nombre:  "<< ebr.part_name<<endl;
-                    cout << " Tamaño:  "<< ebr.part_s<<endl;
-                    cout << " Inicio:  "<< ebr.part_start<<endl;
-                    cout << " Status: " << ebr.part_status<<endl;
-                    cout << " Next: " << ebr.part_next<<endl;
-                }
-            }
-        }
-        
-    }
-    fclose(imprimir);
 }

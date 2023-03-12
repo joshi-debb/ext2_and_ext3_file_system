@@ -81,6 +81,7 @@ struct Inodes {
     int i_perm = -1;
 };
 
+
 struct Superblock {
     int s_filesystem_type;
     int s_inodes_count;
@@ -128,7 +129,6 @@ class disk{
         void mount(vector<string> tks);
         void unmount(vector<string> tks);
         void mkfs(vector<string> tks);
-        void rep();
         
         Partition get_mount(string id, string *path);
         vector<EBR> get_type_logic(Partition partition, string path);
