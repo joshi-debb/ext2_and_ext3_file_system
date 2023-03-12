@@ -59,13 +59,13 @@ struct MDisk {
     MPartition mounted_p[99];
 };
 
-typedef struct _Content {
+struct Content{
     char b_name[12];
     int b_inodo = -1;
-} Content;
+} ;
 
 struct Folderblock{
-    Content b_content[4];
+    Content b_content[4] = {{"", -1}, {"", -1}, {"", -1}, {"", -1}};
 };
 
 
@@ -93,7 +93,7 @@ struct Superblock {
     int s_magic = 0xEF53;
     int s_inode_s = sizeof(Inodes);
     int s_block_s = sizeof(Folderblock);
-    int s_fist_ino = 0;
+    int s_first_ino = 0;
     int s_first_blo = 0;
     int s_bm_inode_start;
     int s_bm_block_start;
@@ -131,10 +131,10 @@ class disk{
         void rep();
         
         Partition get_mount(string id, string *path);
+        vector<EBR> get_type_logic(Partition partition, string path);
+        Partition tracker(MBR mbr, string name, string path);
     
     private:
-        Partition tracker(MBR mbr, string name, string path);
-        vector<EBR> get_type_logic(Partition partition, string path);
         string lower(string str);
         void show_mounted();
         MDisk mountd[99];

@@ -859,7 +859,7 @@ void disk::mkfs(vector<string> tks) {
         int n;
         if (lower(fs) == "2fs") {
             n = floor((partition.part_s - sizeof(Superblock)) / (sizeof(Inodes) + 3 * sizeof(Fileblock)));
-        } else {
+        } else if (lower(fs) == "3fs"){
             n = floor((partition.part_s - sizeof(Superblock)) / (sizeof(Journaling) + sizeof(Inodes) + 3 * sizeof(Fileblock) + 1));
         }
 
@@ -871,7 +871,7 @@ void disk::mkfs(vector<string> tks) {
         spr.s_mtime = time(nullptr);
         spr.s_umtime = time(nullptr);
         spr.s_mnt_count = 1;
-        if (lower(fs) =="2fs") {
+        if (lower(fs) == "2fs") {
             //sistema de archivos ext2
             spr.s_filesystem_type = 2;
             spr.s_bm_inode_start = partition.part_start + sizeof(Superblock);
@@ -938,7 +938,7 @@ void disk::mkfs(vector<string> tks) {
             inodetmp.i_atime = spr.s_umtime;
             inodetmp.i_ctime = spr.s_umtime;
             inodetmp.i_mtime = spr.s_umtime;
-            inodetmp.i_block[0] = -1;
+            inodetmp.i_block[0] = 1;
             inodetmp.i_type = 1;
             inodetmp.i_perm = 664;
             
@@ -967,7 +967,7 @@ void disk::mkfs(vector<string> tks) {
             fwrite(&fileb, sizeof(Fileblock), 1, bfiles);
             fclose(bfiles);
 
-        } else {
+        } else if (lower(fs) == "3fs"){
             //sisteme de archivos ext3
             spr.s_filesystem_type = 3;
             spr.s_bm_inode_start = partition.part_start + sizeof(Superblock) + (n * sizeof(Journaling));
@@ -1024,7 +1024,7 @@ void disk::mkfs(vector<string> tks) {
             inode.i_perm = 664;
             inode.i_block[0] = 0;
 
-            strcpy(journaling.content, "carpeta principal");
+            strcpy(journaling.content, "carpeta root");
             strcpy(journaling.path, "/");
             journaling.type = 0;
             strcpy(journaling.operation, "mkdir");
@@ -1046,7 +1046,7 @@ void disk::mkfs(vector<string> tks) {
             inodetmp.i_atime = spr.s_umtime;
             inodetmp.i_ctime = spr.s_umtime;
             inodetmp.i_mtime = spr.s_umtime;
-            inodetmp.i_block[0] = -1;
+            inodetmp.i_block[0] = 1;
             inodetmp.i_type = 1;
             inodetmp.i_perm = 664;
             
@@ -1058,7 +1058,7 @@ void disk::mkfs(vector<string> tks) {
             strcpy(joutmp.path, "/users.txt");
             joutmp.type = 1;
             joutmp.size = sizeof(data) + sizeof(Folderblock);
-            strcpy(joutmp.operation, "mkfl");
+            strcpy(joutmp.operation, "mkfile");
             joutmp.date = spr.s_umtime;
 
             Fileblock fileb;
@@ -1066,7 +1066,7 @@ void disk::mkfs(vector<string> tks) {
 
             FILE *bfiles = fopen(path.c_str(), "rb+");
 
-            fseek(bfiles, partition.part_start+ sizeof(Superblock), SEEK_SET);
+            fseek(bfiles, partition.part_start + sizeof(Superblock), SEEK_SET);
             fwrite(&journaling, sizeof(Journaling), 1, bfiles);
             fwrite(&joutmp, sizeof(Journaling), 1, bfiles);
 
@@ -1137,7 +1137,7 @@ Partition disk::tracker(MBR mbr, string name, string path) {
         if (partition.part_status == '1') {
             if (lower(partition.part_name) == lower(name)) {
                 return partition;
-            } else if (partition.part_type == 'e') {
+            } else if (partition.part_type == 'E') {
                 vector<EBR> ebrs = get_type_logic(partition, path);
                 for (EBR ebr : ebrs) {
                     if (ebr.part_status == '1') {

@@ -2,4 +2,9 @@
 *.txt
 *.eea
 *.o
+*.dot
+*.png
+*.svg
+*.jpg
+*.jpeg
 Makefile
