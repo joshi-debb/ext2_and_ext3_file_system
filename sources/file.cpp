@@ -48,7 +48,7 @@ void file::mkdir(vector<string> tks, user Usr, disk Dsk) {
 
     make_dir_file(tmp, r, partition, file_path, "", "");
 
-    cout << "se ha creado el directorio" << endl;
+    cout << "Se ha creado el directorio" << endl;
 
 }
 
@@ -123,7 +123,7 @@ void file::mkfile(vector<string> tks, user Usr, disk Dsk){
 
     make_dir_file(tmp, r, partition, file_path, new_file, contenido);
 
-    cout << "se ha creado el archivo" << endl;
+    cout << "Se ha creado el archivo" << endl;
 }
 
 void file::make_dir_file(vector<string> tmp, bool r, Partition partition, string file_path, string new_file, string content) {

@@ -1,6 +1,5 @@
 .vscode
 *.txt
-*.eea
 *.o
 *.dot
 *.png

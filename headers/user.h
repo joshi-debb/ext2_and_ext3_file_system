@@ -30,7 +30,6 @@ class user{
         void mkusr(vector<string> tks);
         void rmusr(vector<string> tks);
 
-
     private:
         bool user_exists(string user);
         bool group_exists(string group);

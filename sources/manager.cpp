@@ -23,7 +23,7 @@ void manager::cmd(){
     do {
         
         string txt;
-        cout << "Terminal:~$ ";
+        cout << "[MIA]-Terminal:~$ ";
 
         getline(cin, txt);
 
@@ -385,7 +385,7 @@ void manager::make_report(vector<string> tks){
         }else if (lower(name_typ) == "ls"){
             lsf_report();
         }else{
-            throw runtime_error("tipo de reporte no existente");
+            throw runtime_error("Tipo de reporte no existente");
         }
 
         fclose(file);

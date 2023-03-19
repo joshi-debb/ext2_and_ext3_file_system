@@ -37,7 +37,6 @@ class manager{
         string token(string text);              
         vector<string> split_tokens(string text);
         vector<string> split_path(string path);
-
         void pause();
         disk Disk;
         user User;

@@ -70,7 +70,7 @@ void user::login(vector<string> tks, disk Dsk) {
                     active_user.password = password;
                     active_user.uid = stoi(in[0]);
                     logged_in = true;
-                    cout << "logueado correctamente" << endl;
+                    cout << "Logueado correctamente" << endl;
                     return;
                 }
             }
@@ -87,7 +87,7 @@ void user::login(vector<string> tks, disk Dsk) {
 
 //funcion para cerrar sesion
 void user::logout() {
-    cout << "deslogueado correctamente" << endl;
+    cout << "Deslogueado correctamente" << endl;
     logged_in = false;
 }
 
@@ -117,7 +117,7 @@ void user::mkgrp(vector<string> tks) {
 
     try {
         if (lower(active_user.user) != "root") {
-            throw runtime_error("permiso denegado ...solo para usuario root");
+            throw runtime_error("Permiso denegado ...solo para usuario root");
         }
 
         string path;
@@ -138,7 +138,7 @@ void user::mkgrp(vector<string> tks) {
                 aux++;
                 vector<string> in = get_data(line, ',');
                 if (in[2] == name) {
-                    throw runtime_error("el grupo ya existe");
+                    throw runtime_error("El grupo ya existe");
                 }
             }
         }
@@ -147,7 +147,7 @@ void user::mkgrp(vector<string> tks) {
         fseek(rfile, super.s_block_start + sizeof(Folderblock), SEEK_SET);
         fwrite(&fb, sizeof(Fileblock), 1, rfile);
         fclose(rfile);
-        cout << "grupo creado correctamente" << endl;
+        cout << "Grupo creado correctamente" << endl;
 
     }
     catch (exception &e) {
@@ -177,7 +177,7 @@ void user::rmgrp(vector<string> tks) {
 
     try {
         if (lower(active_user.user) != "root") {
-            throw runtime_error("permiso denegado ...solo para usuario root");
+            throw runtime_error("Permiso denegado ...solo para usuario root");
         }
 
         string path;
@@ -208,10 +208,10 @@ void user::rmgrp(vector<string> tks) {
             strcpy(fb.b_content, txt.c_str());
             fseek(rfile, super.s_block_start + sizeof(Folderblock), SEEK_SET);
             fwrite(&fb, sizeof(Fileblock), 1, rfile);
-            cout << "grupo eliminado correctamente" << endl;
+            cout << "Grupo eliminado correctamente" << endl;
 
         }else {
-            throw runtime_error("el grupo no existe");
+            throw runtime_error("El grupo no existe");
         }
 
         fclose(rfile);
@@ -258,12 +258,11 @@ void user::mkusr(vector<string> tks) {
         }
     }
 
-    
 
     try {
 
         if (lower(active_user.user) != "root") {
-            throw runtime_error("permiso denegado ...solo para usuario root");
+            throw runtime_error("Permiso denegado ...solo para usuario root");
         }
 
         string path;
@@ -285,7 +284,7 @@ void user::mkusr(vector<string> tks) {
                     aux++;
                     vector<string> in = get_data(line, ',');
                     if (in[3] == user) { 
-                        throw runtime_error("el usuario ya existe");
+                        throw runtime_error("El usuario ya existe");
                     }
                 }
             }
@@ -294,10 +293,10 @@ void user::mkusr(vector<string> tks) {
             fseek(rfile, super.s_block_start + sizeof(Folderblock), SEEK_SET);
             fwrite(&fb, sizeof(Fileblock), 1, rfile);
             fclose(rfile);
-            cout << "usuario creado correctamente" << endl;
+            cout << "Usuario creado correctamente" << endl;
 
         }else{
-            throw runtime_error("el grupo no existe");
+            throw runtime_error("El grupo no existe");
         }
     }
     catch (exception &e) {
@@ -327,7 +326,7 @@ void user::rmusr(vector<string> tks) {
     try {
 
         if (lower(active_user.user) != "root") {
-            throw runtime_error("permiso denegado ...solo para usuario root");
+            throw runtime_error("Permiso denegado ...solo para usuario root");
         }
 
         string path;
@@ -359,10 +358,10 @@ void user::rmusr(vector<string> tks) {
             fseek(rfile, super.s_block_start + sizeof(Folderblock), SEEK_SET);
             fwrite(&fb, sizeof(Fileblock), 1, rfile);
             fclose(rfile);
-            cout << "usuario eliminado correctamente" << endl;
+            cout << "Usuario eliminado correctamente" << endl;
             
         }else{
-            throw runtime_error("el usuario no existe");
+            throw runtime_error("El usuario no existe");
         }
 
         

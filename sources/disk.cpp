@@ -54,7 +54,7 @@ void disk::mkdisk(vector<string> tks){
             }
             //verificar extension del archivo.dsk
             if(lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
-                cout << "Error: Extensión de archivo no valida" << endl;
+                cout << "Extensión de archivo no valida" << endl;
                 return;
             }
             //obtener ruta de carpetas
@@ -114,7 +114,7 @@ void disk::mkdisk(vector<string> tks){
         fwrite(&disco, sizeof(MBR), 1, file);
         fclose(file);
     }
-    cout << ">MKDISK - Disco Creado en: " << path << endl;
+    cout << "Disco Creado en: " << path << endl;
 }
 
 //comando rmdisk
@@ -298,7 +298,7 @@ void disk::fdisk(vector<string> tks){
 
                 try {
                     tracker(disco, name, path);
-                    cout << ">FDISK - Este nombre ya esta en uso" << endl;
+                    cout << ">Este nombre ya esta en uso" << endl;
                     return;
                 } catch (exception &e) {}
 
@@ -338,7 +338,7 @@ void disk::fdisk(vector<string> tks){
                             addLogic.part_next = -1;
                             addLogic.part_start = nlogic.part_next;
                             fwrite(&addLogic, sizeof(EBR), 1, file);
-                            cout << ">FDISK - particion logica creada correctamente" << endl;
+                            cout << "Particion logica creada correctamente" << endl;
                             fclose(file);
                             return;
                         }
@@ -491,15 +491,15 @@ void disk::fdisk(vector<string> tks){
                         fwrite(&ebr, sizeof(EBR), 1, bfile);
                     }
                     fclose(bfile);
-                    cout << ">FDISK: partición creada correctamente" << endl;
+                    cout << "Partición creada correctamente" << endl;
                 }
             }
             catch (invalid_argument &e) {
-                cout << ">FDISK: " <<e.what() << endl;
+                cout <<e.what() << endl;
                 return;
             }
             catch (exception &e) {
-                cout << ">FDISK: " <<e.what() << endl;
+                cout <<e.what() << endl;
                 return;
             }
         } else {
@@ -516,7 +516,7 @@ void disk::fdisk(vector<string> tks){
 
                 FILE *file = fopen(path.c_str(), "rb+");
                 if (file == NULL) {
-                    throw runtime_error("disco no existente");
+                    throw runtime_error("Disco no existente");
                 }
 
                 MBR disk;
@@ -567,11 +567,11 @@ void disk::fdisk(vector<string> tks){
 
                 rewind(file);
                 fwrite(&disk, sizeof(MBR), 1, file);
-                cout << ">FDISK: la partición se ha aumentado/reducido correctamente" << endl;
+                cout << "La partición se ha aumentado/reducido correctamente" << endl;
                 fclose(file);
             }
             catch (exception &e) {
-                cout<< ">FDISK: " << e.what() << endl;
+                cout << e.what() << endl;
                 return;
             }
 
@@ -583,7 +583,7 @@ void disk::fdisk(vector<string> tks){
 
             FILE *file = fopen(path.c_str(), "rb+");
             if (file == NULL) {
-                throw runtime_error("disco no existente");
+                throw runtime_error("Disco no existente");
             }
 
             MBR disk;
@@ -626,7 +626,7 @@ void disk::fdisk(vector<string> tks){
                             fwrite(&ebr, sizeof(EBR), 1, file);
                             count++;
                         }
-                        cout << ">FDISK: partición eliminada correctamente -" + suprim << endl;
+                        cout << "Partición eliminada correctamente -" + suprim << endl;
                         return;
                     }
                 }
@@ -655,11 +655,11 @@ void disk::fdisk(vector<string> tks){
                 int num = static_cast<int>(past.part_s / 2);
                 fwrite("\0", sizeof("\0"), num, file);
             }
-            cout << ">FDISK: partición eliminada correctamente " << endl;
+            cout << "Partición eliminada correctamente " << endl;
             fclose(file);
         }
         catch (exception &e) {
-            cout << ">FDISK: " << e.what() << endl;
+            cout << e.what() << endl;
             return;
         }
     }
@@ -684,7 +684,7 @@ void disk::mount(vector<string> tks) {
             }
             //verificar extension del archivo.dsk
             if(lower(path.substr(path.find_last_of(".") + 1)) != "dsk"){
-                cout << "Error: Extensión de archivo no valida" << endl;
+                cout << "Extensión de archivo no valida" << endl;
                 return;
             }
         }else if (lower(tk) == "name"){
@@ -704,14 +704,14 @@ void disk::mount(vector<string> tks) {
 
     //verificar que los parametros obligatorios esten
     if (path.empty() || name.empty()) {
-        cout << "Error: Faltan parametros obligatorios" << endl;
+        cout << "Faltan parametros obligatorios" << endl;
         return;
     }
 
     try {
         FILE *validate = fopen(path.c_str(), "r");
         if (validate == NULL) {
-            throw runtime_error("disco no existente");
+            throw runtime_error("Disco no existente");
         }
         
         string name_disk = path.substr(path.find_last_of("/") + 1);
@@ -729,7 +729,7 @@ void disk::mount(vector<string> tks) {
                 EBR ebr = ebrs.at(0);
                 name = ebr.part_name;
             } else {
-                throw runtime_error("no se puede montar una particion extendida");
+                throw runtime_error("No se puede montar una particion extendida");
             }
         }
 
@@ -741,7 +741,7 @@ void disk::mount(vector<string> tks) {
                         strcpy(mountd[i].mounted_p[j].name, name.c_str());
                         id += to_string(j + 1) += name_disk;
                         strcpy(mountd[i].mounted_p[j].id, id.c_str());
-                        cout << "se ha realizado correctamente el mount " << endl;
+                        cout << "Se ha realizado correctamente el mount " << endl;
                         return;
                     }
                 }
@@ -758,7 +758,7 @@ void disk::mount(vector<string> tks) {
                         strcpy(mountd[i].mounted_p[j].name, name.c_str());
                         id += to_string(j + 1) += name_disk;
                         strcpy(mountd[i].mounted_p[j].id, id.c_str());
-                        cout << "se ha realizado correctamente el mount "  << endl;
+                        cout << "Se ha realizado correctamente el mount "  << endl;
                         return;
                     }
                 }
@@ -796,13 +796,13 @@ void disk::unmount(vector<string> tks) {
                     if (mountd[i].mounted_p[j].id == id) {
                         MPartition mp = MPartition();
                         mountd[i].mounted_p[j] = mp;
-                        cout << "se ha realizado correctamente el unmount id=" << id << endl;
+                        cout << "Se ha realizado correctamente el unmount id=" << id << endl;
                         return;
                     }
                 }
             }
         }
-        throw runtime_error("id no existente");
+        throw runtime_error("Id no existente");
     }
     catch (invalid_argument &e) {
         cout << e.what() << endl;
@@ -1088,10 +1088,10 @@ void disk::mkfs(vector<string> tks) {
             fclose(bfiles);
         }
 
-        cout << "MKFS formateo realizado con éxito" << endl;
+        cout << "Formateo realizado con éxito" << endl;
     }
     catch (invalid_argument &e) {
-        cout << "identificador de disco incorrecto" << endl;
+        cout << "Identificador de disco incorrecto" << endl;
         return;
     }
     catch (exception &e) {
@@ -1108,7 +1108,7 @@ Partition disk::get_mount(string id, string *path) {
                 if (mountd[i].mounted_p[j].id == id) {
                     FILE *validate = fopen(mountd[i].path, "r");
                     if (validate == NULL) {
-                        throw runtime_error("disco no existente");
+                        throw runtime_error("Disco no existente");
                     }
                     MBR disk;
                     rewind(validate);
@@ -1120,7 +1120,7 @@ Partition disk::get_mount(string id, string *path) {
             }
         }
     }
-    throw runtime_error("id no existente ");
+    throw runtime_error("Id no existente ");
 
 }
 
@@ -1155,7 +1155,7 @@ Partition disk::tracker(MBR mbr, string name, string path) {
             }
         }
     }
-    throw runtime_error("la partición no existe");
+    throw runtime_error("La partición no existe");
 }
 
 //funcion para obtener particiones logicas
@@ -1195,7 +1195,7 @@ string disk::lower(string String){
 
 //funcion para mostrar particiones montadas
 void disk::show_mounted() {
-    system("clear"); 
+    
     cout << "Listado de particiones montadas" << endl;
     for (int i = 0; i < 99; i++) {
         for (int j = 0; j < 26; j++) {
