@@ -21,6 +21,7 @@ class user{
     public:
 
         bool logged_in = false;
+        User active_user;
 
         void login(vector<string> tks, disk Disk);
         void logout();
@@ -38,7 +39,6 @@ class user{
         string lower(string str);
         Superblock super;
         Fileblock fb;
-        User active_user;
         disk Disk;
 };
 

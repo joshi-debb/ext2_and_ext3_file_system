@@ -18,26 +18,28 @@ using namespace std;
 //funcion de terminal
 void manager::cmd(){
 
-    do {
-        system("clear");
-        string txt;
+    system("clear");
 
+    do {
+        
+        string txt;
         cout << "Terminal:~$ ";
+
         getline(cin, txt);
 
         string tk = token(txt);
         vector<string> tks = split_tokens(txt);
 
         search(tk,tks);
-
         getline(cin, txt);
+
     } while (true);
 
 }
 
 //funcion para buscar comando
 void manager::search(string tk,vector<string> tks){
-    
+
     if (lower(tk) == "mkdisk"){
         Disk.mkdisk(tks);
     }else if (lower(tk) == "rmdisk"){
@@ -56,12 +58,15 @@ void manager::search(string tk,vector<string> tks){
     }else if (lower(tk) == "logout"){
         if (User.logged_in) User.logout();
         else cout << "No hay ninguna sesion iniciada" << endl;
-    }else if (lower(tk) == "mkgrp" || lower(tk) == "rmgrp" || lower(tk) == "mkusr" || lower(tk) == "rmusr"){
+    }else if (lower(tk) == "mkgrp" || lower(tk) == "rmgrp" || lower(tk) == "mkusr" \
+     || lower(tk) == "rmusr" || lower(tk) == "mkdir" || lower(tk) == "mkfile"){
         if (User.logged_in){
             if (lower(tk) == "mkgrp") User.mkgrp(tks);
             else if (lower(tk) == "rmgrp") User.rmgrp(tks);
             else if (lower(tk) == "mkusr") User.mkusr(tks);
             else if (lower(tk) == "rmusr") User.rmusr(tks);
+            else if (lower(tk) == "mkdir") File.mkdir(tks, User, Disk);
+            else if (lower(tk) == "mkfile") File.mkfile(tks, User, Disk);
         }else{
             cout << "No hay ninguna sesion iniciada" << endl;
         }
@@ -696,7 +701,7 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
         Fileblock flb;
 
         string strGrafica;
-        strGrafica += "digraph G{ \n rankdir=LR; \n graph [ dpi = \"800\" ]; \n node [shape = plaintext]; \n";
+        strGrafica += "digraph G{ \n rankdir=LR; \n graph []; \n node [shape = plaintext]; \n";
 
         for (int i = 0; i < free_inodes; ++i) {
             strGrafica += "inode" + to_string(i) + " [label = <<table border='0' cellborder='1' cellspacing='0'>\n";
@@ -831,7 +836,7 @@ void manager::jrl_report(string rep_path, FILE &file, string file_dot,  Superblo
         }
 
         string strGrafica;
-        strGrafica += "digraph G{ \n rankdir=LR; graph [ dpi = \"800\" ]; \n node [shape = plaintext];";
+        strGrafica += "digraph G{ \n rankdir=LR; graph [ ]; \n node [shape = plaintext];";
 
         int i = 0;
         do {

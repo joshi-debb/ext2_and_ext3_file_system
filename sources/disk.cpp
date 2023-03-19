@@ -942,7 +942,6 @@ void disk::mkfs(vector<string> tks) {
             inodetmp.i_type = 1;
             inodetmp.i_perm = 664;
             
-
             inode.i_s = inodetmp.i_s + sizeof(Folderblock) + sizeof(Inodes);
 
             Fileblock fileb;
@@ -1051,7 +1050,6 @@ void disk::mkfs(vector<string> tks) {
             inodetmp.i_type = 1;
             inodetmp.i_perm = 664;
             
-
             inode.i_s = inodetmp.i_s + sizeof(Folderblock) + sizeof(Inodes);
 
             Journaling joutmp;

@@ -4,6 +4,7 @@
 
 #include "../headers/disk.h"
 #include "../headers/user.h"
+#include "../headers/file.h"
 
 #include <string>
 #include <vector>
@@ -38,6 +39,7 @@ class manager{
         void pause();
         disk Disk;
         user User;
+        file File;
 };
 
 #endif // MANAGER_H
