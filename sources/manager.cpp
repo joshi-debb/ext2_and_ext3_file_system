@@ -59,7 +59,7 @@ void manager::search(string tk,vector<string> tks){
         if (User.logged_in) User.logout();
         else cout << "No hay ninguna sesion iniciada" << endl;
     }else if (lower(tk) == "mkgrp" || lower(tk) == "rmgrp" || lower(tk) == "mkusr" \
-     || lower(tk) == "rmusr" || lower(tk) == "mkdir" || lower(tk) == "mkfile"){
+     || lower(tk) == "rmusr" || lower(tk) == "mkdir" || lower(tk) == "mkfile" || lower(tk)== "cat"){
         if (User.logged_in){
             if (lower(tk) == "mkgrp") User.mkgrp(tks);
             else if (lower(tk) == "rmgrp") User.rmgrp(tks);
@@ -67,6 +67,7 @@ void manager::search(string tk,vector<string> tks){
             else if (lower(tk) == "rmusr") User.rmusr(tks);
             else if (lower(tk) == "mkdir") File.mkdir(tks, User, Disk);
             else if (lower(tk) == "mkfile") File.mkfile(tks, User, Disk);
+            else if (lower(tk) == "cat") File.cat(tks, User, Disk);
         }else{
             cout << "No hay ninguna sesion iniciada" << endl;
         }
@@ -204,6 +205,23 @@ string manager::lower(string String){
     return aux;
 }
 
+vector<string> manager::split_path(string path) {
+    vector<string> result;
+    if (path.empty()) {
+        return result;
+    }
+
+    stringstream ss(path);
+    string item;
+    while (getline(ss, item, '/')) {
+        if (!item.empty()) {
+            result.push_back(item);
+        }
+    }
+
+    return result;
+}
+
 //funcion para preparar reporte
 void manager::make_report(vector<string> tks){
 
@@ -213,7 +231,9 @@ void manager::make_report(vector<string> tks){
     string dir_path;
     string bin_path;
     string file_dot;
-    string file_txt;  
+    string file_txt;
+    string fle_ruta;
+    string fle_path;
     
     //extraer parametros
     for (string token : tks){
@@ -257,6 +277,13 @@ void manager::make_report(vector<string> tks){
                     break;
                 }
             }
+        }else if (lower(tk) == "ruta"){
+            //si trae comillas extraerlas
+            if (token.substr(0, 1) == "\""){
+                fle_ruta = token.substr(1, token.length() - 2);
+            }else{
+                fle_ruta = token;
+            }
         }
     }
 
@@ -269,14 +296,17 @@ void manager::make_report(vector<string> tks){
         Inodes inodes;
         Journaling journal;
 
-        //verificar si existe el directorio
-        DIR* dir = opendir(dir_path.c_str());
-        if (dir) {
-            closedir(dir);
-        } else {
-            string cmds = "mkdir -p \"" + dir_path + "\"";
-            system(cmds.c_str());
+        if (lower(name_typ) != "file"){
+            //verificar si existe el directorio
+            DIR* dir = opendir(dir_path.c_str());
+            if (dir) {
+                closedir(dir);
+            } else {
+                string cmds = "mkdir -p \"" + dir_path + "\"";
+                system(cmds.c_str());
+            }
         }
+        
 
         //verificar si existe la particion
         Partition partition = Disk.get_mount(id_mount, &bin_path);
@@ -351,7 +381,7 @@ void manager::make_report(vector<string> tks){
         }else if (lower(name_typ) == "journaling"){
             jrl_report(rep_path, *file, file_dot, super, journal, partition);
         }else if (lower(name_typ) == "file"){
-            fle_report();
+            fle_report(rep_path, *file, fle_ruta, super, inodes, free_inodes);
         }else if (lower(name_typ) == "ls"){
             lsf_report();
         }else{
@@ -739,7 +769,6 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
                                 } else {
                                     aux = fb.b_content[k].b_name;
                                 }
-                                cout << "aux: " << aux << endl;
                                 strGrafica += "<tr>\n <td>" + aux + "</td>\n <td port=\"" + to_string(k) + "\">" + to_string(fb.b_content[k].b_inodo) + "</td>\n </tr>\n";
                             }
                             strGrafica += "</table>>];\n";
@@ -763,8 +792,7 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
                             strGrafica += "block" + to_string(inodes.i_block[j]) + " [label = <<table border='0' cellborder='1' cellspacing='0'>\n";
                             strGrafica += "<tr><td colspan = '2' ><b> block " + to_string(inodes.i_block[j]) + "</b></td></tr>\n";
                             strGrafica += "<tr><td colspan = '2'>"; 
-                            strGrafica += string(flb.b_content);
-                            cout << "flb: " << flb.b_content << endl;
+                            strGrafica += flb.b_content;
                             strGrafica += "</td></tr>\n"; 
                             strGrafica += "</table>>];\n";
                         }
@@ -781,8 +809,8 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
         outfile.close();
         string function = "dot -Tjpg " + file_dot + " -o " + rep_path;
         system(function.c_str());
-        // function = "rm \"" + file_dot + "\"";
-        // system(function.c_str());
+        function = "rm \"" + file_dot + "\"";
+        system(function.c_str());
         cout << "Reporte generado en: " << rep_path << endl;
     } catch (exception &e) {
         cout << e.what() << endl;
@@ -883,8 +911,78 @@ void manager::jrl_report(string rep_path, FILE &file, string file_dot,  Superblo
 }
 
 //reporte file
-void manager::fle_report(){
+void manager::fle_report(string rep_path, FILE &file, string fle_ruta,  Superblock super, Inodes inodes, int free_inodes){
 
+    string name;
+
+    vector<string> tmp = split_path(rep_path);
+
+    name = tmp.back();
+    
+    string fle_path;
+    int block_num = 0;
+
+    //obtener ruta de carpetas
+    fle_path = fle_ruta;
+    for (int i = fle_path.length() - 1; i >= 0; i--){
+        if (fle_ruta[i] == '/'){
+            fle_path = fle_path.substr(0, i);
+            break;
+        }
+    }
+
+    //verificar si existe el directorio
+    DIR* dir = opendir(fle_path.c_str());
+    if (dir) {
+        closedir(dir);
+    } else {
+        string cmds = "mkdir -p \"" + fle_path + "\"";
+        system(cmds.c_str());
+    }
+
+
+    Folderblock fb;
+    Fileblock flb;
+
+    string content_of_file;
+
+    for (int i = 0; i < free_inodes; i++) {
+        for (int j = 0; j < 15; j++) {
+            if (inodes.i_block[j] != -1) {
+                if (j < 12) {
+                    if (inodes.i_type == 1 && block_num != 0) {
+                        fseek(&file, super.s_block_start + (sizeof(Fileblock) * inodes.i_block[j]),SEEK_SET);
+                        fread(&flb, sizeof(Fileblock), 1, &file);
+                        content_of_file = flb.b_content;
+                        ofstream archivo(fle_ruta);
+                        archivo << content_of_file.c_str();
+                        archivo.close();
+                        cout << "Reporte generado en: " << fle_ruta << endl;
+                        return;
+
+                    } else {
+                        fseek(&file, super.s_block_start + (sizeof(Folderblock) * inodes.i_block[j]),SEEK_SET);
+                        fread(&fb, sizeof(Fileblock), 1, &file);
+                        for (int k = 0; k < 4; k++) {
+                            string aux;
+                            if (fb.b_content[k].b_name[0] == '\0') {
+                                aux = " ";
+                            } else {
+                                aux = fb.b_content[k].b_name;
+                            }
+                            if (lower(aux) == lower(name)) {
+                                block_num = inodes.i_block[j];
+                                break;
+                            }
+                        }
+         
+                    }
+                }
+            }
+        }
+        fseek(&file, super.s_inode_start + (sizeof(Inodes) * (i + 1)), SEEK_SET);
+        fread(&inodes, sizeof(Inodes), 1, &file);
+    }
 }
 
 //reporte ls

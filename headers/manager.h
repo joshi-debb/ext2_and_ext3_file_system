@@ -28,7 +28,7 @@ class manager{
         void tre_report(string rep_path, FILE &file, string file_dot, Superblock super, Inodes inodes, int free_inodes);
         void spr_report(string path_rep, string path_dot, Superblock super);
         void jrl_report(string rep_path, FILE &file, string file_dot,  Superblock super, Journaling journal, Partition partition);
-        void fle_report();
+        void fle_report(string rep_path, FILE &file, string file_dot, Superblock super, Inodes inodes, int free_blocks);
         void lsf_report();
         string get_date(time_t &date);
         void search(string tk,vector<string> tks);
@@ -36,6 +36,8 @@ class manager{
         string lower(string str);
         string token(string text);              
         vector<string> split_tokens(string text);
+        vector<string> split_path(string path);
+
         void pause();
         disk Disk;
         user User;

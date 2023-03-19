@@ -515,6 +515,125 @@ void file::make_dir_file(vector<string> tmp, bool r, Partition partition, string
 
 }
 
+void file::cat(vector<string> tks, user Usr, disk Dsk){
+
+    string path1;
+    string content;
+    string file_path;
+    
+    User = Usr;
+    Disk = Dsk;
+
+    //extraer parametros
+    for (string token : tks){
+        string tk = token.substr(0, token.find("="));
+        token.erase(0, tk.length() + 1);
+        if (lower(tk) == "file1"){
+            //si trae comillas extraerlas
+            if (token.substr(0, 1) == "\""){
+                path1 = token.substr(1, token.length() - 2);
+            }else{
+                path1 = token;
+            }
+        }
+    }
+
+    try{
+    
+        Partition partition = Disk.get_mount(User.active_user.id, &file_path);
+
+        vector<string> tmp = split_path(path1);
+
+        string name = tmp.back();
+        
+        int block_num = 0;
+
+        int free_inodes = -1;
+        int free_blocks = -1;
+
+        Superblock super;
+        Inodes inodes;
+        Journaling journal;
+
+
+        FILE *file = fopen(file_path.c_str(), "rb+");
+
+        //leer superblock
+        fseek(file, partition.part_start, SEEK_SET);
+        fread(&super, sizeof(Superblock), 1, file);
+
+        //leer inodos
+        fseek(file, super.s_inode_start, SEEK_SET);
+        fread(&inodes, sizeof(Inodes), 1, file);
+
+        char ch_inode = 'x';
+        //econtrar inodos usados
+        fseek(file, super.s_bm_inode_start, SEEK_SET);
+        for (int i = 0; i < super.s_inodes_count; i++) {
+            fread(&ch_inode, sizeof(ch_inode), 1, file);
+            if (ch_inode == '0') {
+                free_inodes = i;
+                break;
+            }
+        }
+
+        char ch_block = 'x';
+        //encontrar bloques usados
+        fseek(file, super.s_bm_block_start, SEEK_SET);
+        for (int i = 0; i < super.s_blocks_count; i++) {
+            fread(&ch_block, sizeof(ch_block), 1, file);
+            if (ch_block == '0') {
+                free_blocks = i;
+                break;
+            }
+        }
+
+        rewind(file);
+
+        Folderblock fb;
+        Fileblock flb;
+
+        for (int i = 0; i < free_inodes; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (inodes.i_block[j] != -1) {
+                    if (j < 12) {
+                        if (inodes.i_type == 1 && block_num != 0) {
+                            fseek(file, super.s_block_start + (sizeof(Fileblock) * inodes.i_block[j]),SEEK_SET);
+                            fread(&flb, sizeof(Fileblock), 1, file);
+                            cout << "#" << flb.b_content << endl;
+                            return;
+                        } else {
+                            fseek(file, super.s_block_start + (sizeof(Folderblock) * inodes.i_block[j]),SEEK_SET);
+                            fread(&fb, sizeof(Fileblock), 1, file);
+
+                            for (int k = 0; k < 4; k++) {
+                                string aux;
+                                if (fb.b_content[k].b_name[0] == '\0') {
+                                    aux = " ";
+                                } else {
+                                    aux = fb.b_content[k].b_name;
+                                }
+                                if (lower(aux) == lower(name)) {
+                                    block_num = inodes.i_block[j];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            fseek(file, super.s_inode_start + (sizeof(Inodes) * (i + 1)), SEEK_SET);
+            fread(&inodes, sizeof(Inodes), 1, file);
+        }
+        fclose(file);
+
+
+
+    } catch (exception &e) {
+        cout << e.what() << endl;
+    }
+}
+
 vector<string> file::split_path(string path) {
     vector<string> result;
     if (path.empty()) {
