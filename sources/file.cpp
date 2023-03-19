@@ -52,7 +52,6 @@ void file::mkdir(vector<string> tks, user Usr, disk Dsk) {
 
 }
 
-            
 void file::mkfile(vector<string> tks, user Usr, disk Dsk){
 
     bool r = false;
@@ -96,16 +95,30 @@ void file::mkfile(vector<string> tks, user Usr, disk Dsk){
     aux_tmp.pop_back();
     new_file = aux_tmp.back();
 
-    cout << "new_file: " << new_file << endl;
-
     Partition partition = Disk.get_mount(User.active_user.id, &file_path);
 
     vector<string> tmp = split_path(path);
 
     //crear contenido segun parametro size
     string contenido = "";
-    for (int i = 0; i < size; i++) {
-        contenido += to_string(i % 10);
+    
+    if (cont_path != ""){
+
+        FILE *cont_file = fopen(cont_path.c_str(), "rb+");
+        if (cont_file != NULL){
+            char ch;
+            while ((ch = fgetc(cont_file)) != EOF){
+                contenido += ch;
+            }
+            fclose(cont_file);
+        }
+
+    }else{
+        
+        for (int i = 0; i < size; i++) {
+            contenido += to_string(i % 10);
+        }
+
     }
 
     make_dir_file(tmp, r, partition, file_path, new_file, contenido);
@@ -252,6 +265,8 @@ void file::make_dir_file(vector<string> tmp, bool r, Partition partition, string
             }
         }
 
+        Fileblock files;
+
         fnd = false;
         for (int i = 0; i < 15; ++i) {
             if (inode.i_block[i] != -1) {
@@ -283,23 +298,33 @@ void file::make_dir_file(vector<string> tmp, bool r, Partition partition, string
 
                             inodetmp.i_uid = 1;
                             inodetmp.i_gid = 1;
-                            inodetmp.i_s = sizeof(sizeof(Folderblock));
                             inodetmp.i_atime = spr.s_umtime;
                             inodetmp.i_ctime = spr.s_umtime;
                             inodetmp.i_mtime = spr.s_umtime;
-                            inodetmp.i_type = 0;
                             inodetmp.i_perm = 664;
                             inodetmp.i_block[0] = bb;
 
-                            strcpy(foldertmp.b_content[0].b_name, ".");
-                            foldertmp.b_content[0].b_inodo = bi;
-                            strcpy(foldertmp.b_content[1].b_name, "..");
-                            foldertmp.b_content[1].b_inodo = father;
-                            strcpy(foldertmp.b_content[2].b_name, "-");
-                            strcpy(foldertmp.b_content[3].b_name, "-");
+                            if (is_file) {
+                                inodetmp.i_type = 1;
+                                inodetmp.i_s = sizeof(content.c_str()) + sizeof(Folderblock);
+                                strcpy(foldertmp.b_content[0].b_name, content.c_str() );
+                                foldertmp.b_content[0].b_inodo = bi;
+                                foldertmp.b_content[1].b_inodo = father;
+                                folder.b_content[j].b_inodo = bi;
+                                strcpy(folder.b_content[j].b_name, new_file_dir.c_str());
+                            } else {
+                                inodetmp.i_type = 0;
+                                inodetmp.i_s = sizeof(sizeof(Folderblock));
+                                strcpy(foldertmp.b_content[0].b_name, ".");
+                                foldertmp.b_content[0].b_inodo = bi;
+                                strcpy(foldertmp.b_content[1].b_name, "..");
+                                foldertmp.b_content[1].b_inodo = father;
+                                strcpy(foldertmp.b_content[2].b_name, "-");
+                                strcpy(foldertmp.b_content[3].b_name, "-");
+                                folder.b_content[j].b_inodo = bi;
+                                strcpy(folder.b_content[j].b_name, new_file_dir.c_str());
+                            }
 
-                            folder.b_content[j].b_inodo = bi;
-                            strcpy(folder.b_content[j].b_name, new_file_dir.c_str());
                             fnd = true;
                             i = 20;
                             break;

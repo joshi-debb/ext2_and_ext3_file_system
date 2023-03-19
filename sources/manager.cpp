@@ -739,6 +739,7 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
                                 } else {
                                     aux = fb.b_content[k].b_name;
                                 }
+                                cout << "aux: " << aux << endl;
                                 strGrafica += "<tr>\n <td>" + aux + "</td>\n <td port=\"" + to_string(k) + "\">" + to_string(fb.b_content[k].b_inodo) + "</td>\n </tr>\n";
                             }
                             strGrafica += "</table>>];\n";
@@ -762,7 +763,8 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
                             strGrafica += "block" + to_string(inodes.i_block[j]) + " [label = <<table border='0' cellborder='1' cellspacing='0'>\n";
                             strGrafica += "<tr><td colspan = '2' ><b> block " + to_string(inodes.i_block[j]) + "</b></td></tr>\n";
                             strGrafica += "<tr><td colspan = '2'>"; 
-                            strGrafica += flb.b_content;
+                            strGrafica += string(flb.b_content);
+                            cout << "flb: " << flb.b_content << endl;
                             strGrafica += "</td></tr>\n"; 
                             strGrafica += "</table>>];\n";
                         }
@@ -779,8 +781,8 @@ void manager::tre_report(string rep_path, FILE &file, string file_dot,  Superblo
         outfile.close();
         string function = "dot -Tjpg " + file_dot + " -o " + rep_path;
         system(function.c_str());
-        function = "rm \"" + file_dot + "\"";
-        system(function.c_str());
+        // function = "rm \"" + file_dot + "\"";
+        // system(function.c_str());
         cout << "Reporte generado en: " << rep_path << endl;
     } catch (exception &e) {
         cout << e.what() << endl;
